@@ -1,0 +1,29 @@
+{
+    "name": "__MSG_extension_name__"
+  , "description": "__MSG_extension_description__"
+  , "version": "0.0.1"
+  , "author": "Matt Hensman <m@matt.tf>"
+
+
+  , "default_locale": "en"
+  , "manifest_version": 2
+
+  , "applications": {
+        "gecko": {
+            "id": "disable_tab_detach@matt.tf"
+          , "strict_min_version": "55.0"
+        }
+    }
+
+  , "background": {
+        "scripts": [
+            "main.js"
+        ]
+      , "persistent": false
+    }
+
+  , "page_action": {}
+  , "permissions": [
+        "tabs"
+    ]
+}

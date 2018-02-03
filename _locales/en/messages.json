@@ -1,0 +1,8 @@
+{
+    "extension_name": {
+        "message": "Disable Tab Detach"
+    }
+  , "extension_description": {
+        "message": "Returns a tab to its original window and position on detach"
+    }
+}
