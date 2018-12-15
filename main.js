@@ -1,20 +1,62 @@
 "use strict";
 
-let should_revert = true;
+const pinnedTabs = new Set;
 
-browser.tabs.onDetached.addListener((tabId, details) => {
-    if (should_revert) {
-        should_revert = false;
+browser.tabs.query({ pinned: true })
+    .then(tabs => {
+        for (const tab of tabs) {
+            pinnedTabs.add(tab.id);
+        }
+    });
 
-        browser.tabs.move(tabId, {
+browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if ("pinned" in changeInfo) {
+        if (changeInfo.pinned) {
+            pinnedTabs.add(tabId);
+        } else if (!("windowId" in changeInfo)) {
+            pinnedTabs.delete(tabId);
+        }
+    }
+});
+
+browser.tabs.onCreated.addListener(tab => {
+    if (tab.pinned) {
+        pinnedTabs.add(tab.id);
+    }
+});
+
+browser.tabs.onRemoved.addListener(tabId => {
+    pinnedTabs.delete(tabId);
+});
+
+
+
+let shouldRevert = true;
+
+browser.tabs.onDetached.addListener(async (tabId, details) => {
+    if (!shouldRevert) {
+        return;
+    }
+
+    shouldRevert = false;
+
+    try {
+        await browser.windows.get(details.oldWindowId);
+
+        await browser.tabs.move(tabId, {
             windowId: details.oldWindowId
           , index: details.oldPosition
-        }).then(([ tab ]) => {
-            return browser.tabs.update(tab.id, {
-                active: true
-            })
-        }).then(() => {
-            should_revert = true;
+        });
+    } catch (err) {
+        await browser.windows.create({
+            tabId
         });
     }
+
+    await browser.tabs.update(tabId, {
+        active: true
+      , pinned: pinnedTabs.has(tabId)
+    });
+
+    shouldRevert = true;
 });
