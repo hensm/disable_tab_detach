@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extension_name__"
   , "description": "__MSG_extension_description__"
-  , "version": "0.0.1"
+  , "version": "0.0.3"
   , "author": "Matt Hensman <m@matt.tf>"
 
 
