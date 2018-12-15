@@ -10,10 +10,10 @@ browser.tabs.query({ pinned: true })
     });
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
-    if ("pinned" in changeInfo) {
+    if (!("windowId" in changeInfo) && ("pinned" in changeInfo)) {
         if (changeInfo.pinned) {
             pinnedTabs.add(tabId);
-        } else if (!("windowId" in changeInfo)) {
+        } else {
             pinnedTabs.delete(tabId);
         }
     }
@@ -37,6 +37,16 @@ browser.tabs.onDetached.addListener(async (tabId, details) => {
     if (!shouldRevert) {
         return;
     }
+
+    const { length: highlightedCount }
+        = await browser.tabs.query({ highlighted: true });
+    const { length: windowCount }
+        = await browser.windows.getAll({ windowTypes: [ "normal" ] });
+
+    // Don't try to revert actions on multiple highlighted tabs
+    if (highlightedCount > windowCount) {
+        return;
+    }    
 
     shouldRevert = false;
 
