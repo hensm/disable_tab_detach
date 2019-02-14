@@ -54,9 +54,15 @@ browser.tabs.onAttached.addListener(async (tabId, details) => {
 });
 
 
+// Pause extension functionality
+let pauseExtension = false;
 let shouldRevert = true;
 
 async function onTabMovedBetweenWindows (tabId, details) {
+    if (pauseExtension) {
+        return;
+    }
+
     if (!shouldRevert) {
         return;
     }
@@ -129,6 +135,13 @@ async function moveTabToNewWindow (tabId) {
 
 
 browser.menus.create({
+    id: "pauseExtension"
+  , title: _("pauseExtension")
+  , type: "checkbox"
+  , checked: pauseExtension
+  , contexts: [ "tab" ]
+});
+browser.menus.create({
     id: "moveTabToNewWindow"
   , title: _("moveTabToNewWindow")
   , contexts: [ "tab" ]
@@ -151,7 +164,11 @@ browser.menus.onClicked.addListener(async (info, tab) => {
         case "moveTabToNewWindow": {
             moveTabToNewWindow(tab.id);
             break;
-        }
+        };
+
+        case "pauseExtension": {
+            pauseExtension = info.checked;
+        };
 
         default: {
             if (info.menuItemId.startsWith("win-")) {
@@ -245,6 +262,17 @@ browser.commands.onCommand.addListener(async name => {
             });
 
             moveTabToNewWindow(currentTab.id);
+
+            break;
+        };
+
+        case "pauseExtension": {
+            pauseExtension = !pauseExtension;
+            browser.menus.update("pauseExtension", {
+                checked: pauseExtension
+            });
+
+            break;
         }
     }
 });

@@ -22,6 +22,12 @@
             }
           , "description": "Move current tab to a new window"
         }
+      , "pauseExtension": {
+            "suggested_key": {
+                "default": "Ctrl+Alt+P"
+            }
+          , "description": "Temporarily pause extension"
+        }
     }
   , "default_locale": "en"
   , "manifest_version": 2

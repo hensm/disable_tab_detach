@@ -6,6 +6,9 @@
         "message": "Returns a tab to its original window and position on detach"
     }
 
+  , "pauseExtension": {
+        "message": "Pause Extension"
+    }
   , "moveTabToNewWindow": {
         "message": "Move Tab to New Window"
     }
