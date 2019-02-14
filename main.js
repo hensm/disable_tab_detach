@@ -33,10 +33,30 @@ browser.tabs.onRemoved.addListener(tabId => {
 });
 
 
+let detachDetails = null;
+let attachDetails = null;
+
+browser.tabs.onDetached.addListener(async (tabId, details) => {
+    if (detachDetails && attachDetails) {
+        attachDetails = null;
+    }
+
+    detachDetails = details;
+});
+
+browser.tabs.onAttached.addListener(async (tabId, details) => {
+    attachDetails = details;
+
+    onTabMovedBetweenWindows(tabId, {
+        ...detachDetails
+      , ...attachDetails
+    });
+});
+
 
 let shouldRevert = true;
 
-browser.tabs.onDetached.addListener(async (tabId, details) => {
+async function onTabMovedBetweenWindows (tabId, details) {
     if (!shouldRevert) {
         return;
     }
@@ -49,7 +69,16 @@ browser.tabs.onDetached.addListener(async (tabId, details) => {
     // Don't try to revert actions on multiple highlighted tabs
     if (highlightedCount > windowCount) {
         return;
-    }    
+    }
+
+    const newWindow = await browser.windows.get(details.newWindowId, {
+        populate: true
+    });
+
+    // Don't revert moves between existing windows
+    if (newWindow.tabs.length > 1) {
+        return;
+    }
 
     shouldRevert = false;
 
@@ -72,7 +101,7 @@ browser.tabs.onDetached.addListener(async (tabId, details) => {
     });
 
     shouldRevert = true;
-});
+}
 
 
 async function moveTabToWindow (tabId, windowId, pinned) {
@@ -189,7 +218,6 @@ browser.menus.onShown.addListener(async (info, tab) => {
         ])
 
         if (!temporaryMenuIds.has(winMenuId)) {
-            console.log(win.tabs.length)
             browser.menus.create({
                 id: winMenuId
               , contexts: [ "tab" ]
@@ -220,5 +248,3 @@ browser.commands.onCommand.addListener(async name => {
         }
     }
 });
-
-
