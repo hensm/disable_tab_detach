@@ -1,8 +1,18 @@
 {
-    "extension_name": {
+    "extensionName": {
         "message": "Disable Tab Detach"
     }
-  , "extension_description": {
+  , "extensionDescription": {
         "message": "Returns a tab to its original window and position on detach"
+    }
+
+  , "moveTabToNewWindow": {
+        "message": "Move Tab to New Window"
+    }
+  , "moveTabToWindow": {
+        "message": "Move Tab to Window:"
+    }
+  , "windowTitle": {
+        "message": "[$2]: $1"
     }
 }
