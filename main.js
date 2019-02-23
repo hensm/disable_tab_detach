@@ -88,6 +88,10 @@ async function onTabMovedBetweenWindows (tabId, details) {
 
     shouldRevert = false;
 
+    await browser.tabs.update(tabId, {
+        pinned: pinnedTabs.has(tabId)
+    });
+
     try {
         await browser.windows.get(details.oldWindowId);
 
@@ -103,7 +107,6 @@ async function onTabMovedBetweenWindows (tabId, details) {
 
     await browser.tabs.update(tabId, {
         active: true
-      , pinned: pinnedTabs.has(tabId)
     });
 
     shouldRevert = true;
